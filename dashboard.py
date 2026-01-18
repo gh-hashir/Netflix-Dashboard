@@ -235,7 +235,7 @@ if view_mode == "📊 Dashboard":
         # Top Countries
         country_data = filtered_df["country"].dropna().str.split(", ").explode().value_counts().head(10)
         fig2 = px.bar(
-            x=country_data,
+            x=country_data.values,
             y=country_data.index,
             title="🌍 Top 10 Countries by Content",
             color_discrete_sequence=["#e50914"],
