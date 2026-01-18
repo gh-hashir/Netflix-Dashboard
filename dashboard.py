@@ -185,109 +185,135 @@ filtered_df = filtered_df[(filtered_df["release_year"] >= year_filter[0]) &
 if view_mode == "📊 Dashboard":
     st.markdown('<h1 class="netflix-title">📊 Netflix Analytics Dashboard</h1>', unsafe_allow_html=True)
     
-    # KPI Row
-    col1, col2, col3, col4 = st.columns(4)
-    
-    with col1:
-        st.metric(
-            label="📚 Total Content",
-            value=f"{len(filtered_df):,}",
-            delta=f"{len(filtered_df) - len(df)} filtered"
-        )
-    
-    with col2:
-        movie_count = len(filtered_df[filtered_df["type"] == "Movie"])
-        st.metric(label="🎬 Movies", value=f"{movie_count:,}")
-    
-    with col3:
-        show_count = len(filtered_df[filtered_df["type"] == "TV Show"])
-        st.metric(label="📺 TV Shows", value=f"{show_count:,}")
-    
-    with col4:
-        countries = filtered_df["country"].dropna().str.split(", ").explode().nunique()
-        st.metric(label="🌍 Countries", value=f"{countries:,}")
-    
-    st.markdown("---")
-    
-    # Charts Section
-    col1, col2 = st.columns(2)
-    
-    with col1:
-        # Content Type Distribution
-        type_data = filtered_df["type"].value_counts()
-        fig1 = px.pie(
-            values=type_data.values,
-            names=type_data.index,
-            title="📺 Content Type Distribution",
-            color_discrete_sequence=["#e50914", "#221f1f"],
-            hole=0.4
-        )
-        fig1.update_layout(
-            paper_bgcolor="#0f0f0f",
-            plot_bgcolor="#0f0f0f",
-            font=dict(color="#e5e5e5", family="Arial", size=12),
-            title_font_size=16,
-            showlegend=True
-        )
-        st.plotly_chart(fig1, width='stretch')
-    
-    with col2:
-        # Top Countries
-        country_data = filtered_df["country"].dropna().str.split(", ").explode().value_counts().head(10)
-        fig2 = px.bar(
-            x=country_data.values,
-            y=country_data.index,
-            title="🌍 Top 10 Countries by Content",
-            color_discrete_sequence=["#e50914"],
-            orientation="h"
-        )
-        fig2.update_layout(
-            paper_bgcolor="#0f0f0f",
-            plot_bgcolor="#0f0f0f",
-            font=dict(color="#e5e5e5", family="Arial", size=12),
-            title_font_size=16,
-            yaxis_autorange="reversed",
-            xaxis_title="Number of Titles",
-            yaxis_title=""
-        )
-        st.plotly_chart(fig2, width='stretch')
-    
-    col3, col4 = st.columns(2)
-    
-    with col3:
-        # Releases Over Time
-        year_data = filtered_df["release_year"].value_counts().sort_index()
-        fig3 = px.line(
-            x=year_data.index,
-            y=year_data.values,
-            title="📈 Content Released Over Years",
-            markers=True
-        )
-        fig3.update_traces(
-            line=dict(color="#e50914", width=3),
-            marker=dict(size=8, color="#e50914")
-        )
-        fig3.update_layout(
-            paper_bgcolor="#0f0f0f",
-            plot_bgcolor="#0f0f0f",
-            font=dict(color="#e5e5e5", family="Arial", size=12),
-            title_font_size=16,
-            xaxis_title="Year",
-            yaxis_title="Number of Titles",
-            hovermode='x unified'
-        )
-        st.plotly_chart(fig3, width='stretch')
-    
-    with col4:
-        # Ratings Distribution
-        rating_data = filtered_df["rating"].value_counts()
-        fig4 = px.bar(
-            y=rating_data.index,
-            x=rating_data.values,
-            title="⭐ Content by Rating",
+    # Check if data is empty after filtering
+    if len(filtered_df) == 0:
+        st.warning("⚠️ No data matches your filters. Please adjust your selections.")
+    else:
+        # KPI Row
+        col1, col2, col3, col4 = st.columns(4)
+        
+        with col1:
+            st.metric(
+                label="📚 Total Content",
+                value=f"{len(filtered_df):,}",
+                delta=f"{len(filtered_df) - len(df)} filtered"
+            )
+        
+        with col2:
+            movie_count = len(filtered_df[filtered_df["type"] == "Movie"])
+            st.metric(label="🎬 Movies", value=f"{movie_count:,}")
+        
+        with col3:
+            show_count = len(filtered_df[filtered_df["type"] == "TV Show"])
+            st.metric(label="📺 TV Shows", value=f"{show_count:,}")
+        
+        with col4:
+            countries = filtered_df["country"].dropna().str.split(", ").explode().nunique()
+            st.metric(label="🌍 Countries", value=f"{countries:,}")
+        
+        st.markdown("---")
+        
+        # Charts Section
+        col1, col2 = st.columns(2)
+        
+        with col1:
+            # Content Type Distribution
+            type_data = filtered_df["type"].value_counts()
+            fig1 = px.pie(
+                values=type_data.values,
+                names=type_data.index,
+                title="📺 Content Type Distribution",
+                color_discrete_sequence=["#e50914", "#221f1f"],
+                hole=0.4
+            )
+            fig1.update_layout(
+                paper_bgcolor="#0f0f0f",
+                plot_bgcolor="#0f0f0f",
+                font=dict(color="#e5e5e5", family="Arial", size=12),
+                title_font_size=16,
+                showlegend=True
+            )
+            st.plotly_chart(fig1, width='stretch')
+        
+        with col2:
+            # Top Countries
+            country_data = filtered_df["country"].dropna().str.split(", ").explode().value_counts().head(10)
+            fig2 = px.bar(
+                x=country_data.values,
+                y=country_data.index,
+                title="🌍 Top 10 Countries by Content",
+                color_discrete_sequence=["#e50914"],
+                orientation="h"
+            )
+            fig2.update_layout(
+                paper_bgcolor="#0f0f0f",
+                plot_bgcolor="#0f0f0f",
+                font=dict(color="#e5e5e5", family="Arial", size=12),
+                title_font_size=16,
+                yaxis_autorange="reversed",
+                xaxis_title="Number of Titles",
+                yaxis_title=""
+            )
+            st.plotly_chart(fig2, width='stretch')
+        
+        col3, col4 = st.columns(2)
+        
+        with col3:
+            # Releases Over Time
+            year_data = filtered_df["release_year"].value_counts().sort_index()
+            fig3 = px.line(
+                x=year_data.index,
+                y=year_data.values,
+                title="📈 Content Released Over Years",
+                markers=True
+            )
+            fig3.update_traces(
+                line=dict(color="#e50914", width=3),
+                marker=dict(size=8, color="#e50914")
+            )
+            fig3.update_layout(
+                paper_bgcolor="#0f0f0f",
+                plot_bgcolor="#0f0f0f",
+                font=dict(color="#e5e5e5", family="Arial", size=12),
+                title_font_size=16,
+                xaxis_title="Year",
+                yaxis_title="Number of Titles",
+                hovermode='x unified'
+            )
+            st.plotly_chart(fig3, width='stretch')
+        
+        with col4:
+            # Ratings Distribution
+            rating_data = filtered_df["rating"].value_counts()
+            fig4 = px.bar(
+                y=rating_data.index,
+                x=rating_data.values,
+                title="⭐ Content by Rating",
+                color_discrete_sequence=["#e50914"]
+            )
+            fig4.update_layout(
+                paper_bgcolor="#0f0f0f",
+                plot_bgcolor="#0f0f0f",
+                font=dict(color="#e5e5e5", family="Arial", size=12),
+                title_font_size=16,
+                xaxis_title="Count",
+                yaxis_title="",
+                yaxis_autorange="reversed"
+            )
+            st.plotly_chart(fig4, width='stretch')
+        
+        st.markdown("---")
+        
+        # Top Genres
+        st.markdown('<h3 style="color: #e5e5e5; margin: 20px 0;">📽️ Top Genres</h3>', unsafe_allow_html=True)
+        genres = filtered_df["listed_in"].dropna().str.split(", ").explode().value_counts().head(15)
+        fig5 = px.bar(
+            y=genres.index,
+            x=genres.values,
+            title="Top 15 Genres",
             color_discrete_sequence=["#e50914"]
         )
-        fig4.update_layout(
+        fig5.update_layout(
             paper_bgcolor="#0f0f0f",
             plot_bgcolor="#0f0f0f",
             font=dict(color="#e5e5e5", family="Arial", size=12),
@@ -296,29 +322,7 @@ if view_mode == "📊 Dashboard":
             yaxis_title="",
             yaxis_autorange="reversed"
         )
-        st.plotly_chart(fig4, width='stretch')
-    
-    st.markdown("---")
-    
-    # Top Genres
-    st.markdown('<h3 style="color: #e5e5e5; margin: 20px 0;">📽️ Top Genres</h3>', unsafe_allow_html=True)
-    genres = filtered_df["listed_in"].dropna().str.split(", ").explode().value_counts().head(15)
-    fig5 = px.bar(
-        y=genres.index,
-        x=genres.values,
-        title="Top 15 Genres",
-        color_discrete_sequence=["#e50914"]
-    )
-    fig5.update_layout(
-        paper_bgcolor="#0f0f0f",
-        plot_bgcolor="#0f0f0f",
-        font=dict(color="#e5e5e5", family="Arial", size=12),
-        title_font_size=16,
-        xaxis_title="Count",
-        yaxis_title="",
-        yaxis_autorange="reversed"
-    )
-    st.plotly_chart(fig5, width='stretch')
+        st.plotly_chart(fig5, width='stretch')
 
 elif view_mode == "📚 Full Dataset":
     st.markdown('<h2 class="netflix-title">📚 Full Netflix Dataset</h2>', unsafe_allow_html=True)
